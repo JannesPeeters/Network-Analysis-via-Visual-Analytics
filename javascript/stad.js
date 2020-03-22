@@ -1,9 +1,12 @@
 // r2d3: https://rstudio.github.io/r2d3
 //
-
 svg.selectAll("*").remove();
 
-var g = svg.append("g").attr("class", "network-area");
+var colorScale = d3.scaleOrdinal().domain(['2', '3', '4', '5', '6', '7'])
+                                  .range(["grey", "brown", "blue", "darkgreen", "purple", "orange", "yellow"]);
+
+var g = svg.append("g")
+             .attr("class", "network-area");
              
 var link = g.append("g").attr("class", "links")
                             .selectAll("line")
@@ -17,8 +20,8 @@ var node = g.append("g").attr("class", "nodes")
                             .data(data.nodes)
                             .enter()
                             .append("circle")
-                              .attr("r", 80)
-                              .style("fill", "grey")
+                              .attr("r", 10)
+                              .style("fill", d => colorScale(d.hh_size))
                               .on('mouseover.fade', fade(0.1))
                               .on('mouseout.fade', fade(1))
                               .attr("d", function(d) { return d.id; })
@@ -29,25 +32,29 @@ var node = g.append("g").attr("class", "nodes")
                                                     );
                               });
 
-var simulation = cola.d3adaptor(d3)
-      .size([width, height])
-      .nodes(data.nodes)
-      .links(data.links)
-      .jaccardLinkLengths(40, 0.7)
-      .avoidOverlaps(true)
-      .start(100,15,200)
-      .on("tick", ticked);      
-
+      
+  // Let's list the force we wanna apply on the network
+  var simulation = d3.forceSimulation(data.nodes)
+                      .force("link", d3.forceLink() 
+                      .id(function(d) { return d.id; })
+                      .links(data.links)
+                      )
+                      .force("charge", d3.forceManyBody().strength(-600))
+                      .force("center", d3.forceCenter(width / 2, height / 2))
+                      .on("tick", ticked);
                     
     
-function zoom_actions(){ g.attr("transform", d3.event.transform); }
+  function zoom_actions(){
+    g.attr("transform", d3.event.transform);
+    }
   
-var zoom_handler = d3.zoom().on("zoom", zoom_actions);
+  var zoom_handler = d3.zoom()
+      .on("zoom", zoom_actions);
 
-zoom_handler(svg);
+  zoom_handler(svg);
     
-// This function is run at each iteration of the force algorithm, updating the nodes position.
-function ticked() {
+  // This function is run at each iteration of the force algorithm, updating the nodes position.
+  function ticked() {
     link
         .attr("x1", function(d) { return d.source.x })
         .attr("y1", function(d) { return d.source.y })
