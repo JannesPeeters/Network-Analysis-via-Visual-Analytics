@@ -3,9 +3,7 @@
 
 svg.selectAll("*").remove();
 
-
-  var g = svg.append("g")
-             .attr("class", "network-area");
+var g = svg.append("g").attr("class", "network-area");
              
 var link = g.append("g").attr("class", "links")
                             .selectAll("line")
@@ -42,17 +40,14 @@ var simulation = cola.d3adaptor(d3)
 
                     
     
-  function zoom_actions(){
-    g.attr("transform", d3.event.transform);
-    }
+function zoom_actions(){ g.attr("transform", d3.event.transform); }
   
-  var zoom_handler = d3.zoom()
-      .on("zoom", zoom_actions);
+var zoom_handler = d3.zoom().on("zoom", zoom_actions);
 
-  zoom_handler(svg);
+zoom_handler(svg);
     
-  // This function is run at each iteration of the force algorithm, updating the nodes position.
-  function ticked() {
+// This function is run at each iteration of the force algorithm, updating the nodes position.
+function ticked() {
     link
         .attr("x1", function(d) { return d.source.x })
         .attr("y1", function(d) { return d.source.y })
