@@ -1,5 +1,3 @@
-// r2d3: https://rstudio.github.io/r2d3
-//
 svg.selectAll("*").remove();
 
 var colorScale = d3.scaleOrdinal().domain(['0', '1'])
