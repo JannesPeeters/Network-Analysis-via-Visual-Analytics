@@ -1,9 +1,17 @@
 svg.selectAll("*").remove();
 
+svg.attr('height', window.innerHeight - 102)
+      .style('margin-bottom', 21);
+      
+Shiny.addCustomMessageHandler('highlight_Update', function(message) {
+  window.highlighter = message.highlighting;
+  node.style("fill", d => colorScale(d[window.highlighter]));
+});
+
 var colorScale = d3.scaleOrdinal().domain(['0', '1'])
                                   .range(["grey", "brown"]);
 
-  var g = svg.append("g")
+var g = svg.append("g")
              .attr("class", "network-area");
              
 var link = g.append("g").attr("class", "links")
@@ -11,15 +19,15 @@ var link = g.append("g").attr("class", "links")
                             .data(data.links)
                             .enter()
                             .append("line")
+                              .attr("stroke-width", d => d.weight*2)
                               .style("stroke", "#aaa");
 
-var node = g.append("g").attr("class", "nodes")
+window.node = g.append("g").attr("class", "nodes")
                             .selectAll("circle")
                             .data(data.nodes)
                             .enter()
                             .append("circle")
                               .attr("r", 10)
-                              .style("fill", d => colorScale(d.participant))
                               .on('mouseover.fade', fade(0.1))
                               .on('mouseout.fade', fade(1))
                               .attr("d", function(d) { return d.id; })
